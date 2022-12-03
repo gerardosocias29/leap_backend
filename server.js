@@ -18,7 +18,7 @@ app.use(express.json()); /* bodyParser.json() is deprecated */
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to LEMA sapplication." });
+  res.status(200).json({ message: "Welcome to LEMA sapplication." });
 });
 
 require("./app/routes/routes.js")(app);
