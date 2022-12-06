@@ -1,6 +1,6 @@
 module.exports = {
-  HOST: "sql6.freesqldatabase.com",
-  USER: "sql6581472",
-  PASSWORD: "mRGhDJf3fu",
-  DB: "sql6581472"
+  HOST: "lema-app.com",
+  USER: "dffkhuag_lema",
+  PASSWORD: "Aug291998!!",
+  DB: "dffkhuag_lema"
 };
