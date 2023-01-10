@@ -15,9 +15,9 @@ exports.create = (req, res) => {
     var params = req.body;
     // Create a Lesson
     const chapter = new Lesson({
-        chapter_name : params.uid,
-        chapter_details : params.first_name,
-        chapter_type : params.last_name,
+        lesson_name : params.lesson_name,
+        lesson_details : params.lesson_details,
+        chapter_id : params.chapter_id,
     });
   
     // Save Lesson in the database

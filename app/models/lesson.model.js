@@ -1,10 +1,10 @@
 const sql = require("./db.js");
 
 // constructor
-const Lesson = function(chapter) {
-    this.lesson_name = chapter.chapter_name;
-    this.lesson_details = chapter.chapter_details;
-    this.chapter_id = chapter.chapter_type;
+const Lesson = function(lesson) {
+    this.lesson_name = lesson.lesson_name;
+    this.lesson_details = lesson.lesson_details;
+    this.chapter_id = lesson.chapter_id;
 };
 
 Lesson.create = (newLesson, result) => {

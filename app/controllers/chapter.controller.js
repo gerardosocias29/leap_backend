@@ -15,9 +15,9 @@ exports.create = (req, res) => {
     var params = req.body;
     // Create a Chapter
     const chapter = new Chapter({
-        chapter_name : params.uid,
-        chapter_details : params.first_name,
-        chapter_type : params.last_name,
+        chapter_name : params.chapter_name,
+        chapter_details : params.chapter_details,
+        photo_url : params.photo_url,
     });
   
     // Save Chapter in the database

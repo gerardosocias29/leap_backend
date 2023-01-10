@@ -4,7 +4,7 @@ const sql = require("./db.js");
 const Chapter = function(chapter) {
     this.chapter_name = chapter.chapter_name;
     this.chapter_details = chapter.chapter_details;
-    this.chapter_type = chapter.chapter_type;
+    this.photo_url = chapter.photo_url;
 };
 
 Chapter.create = (newChapter, result) => {
@@ -59,12 +59,12 @@ Chapter.getAll = (result) => {
 Chapter.updateById = (id, chapter, result) => {
   sql.query(
     `UPDATE chapters SET 
-        chapter_name = ?, chapter_details = ?, chapter_type = ?
+        chapter_name = ?, chapter_details = ?, photo_url = ?
     WHERE id = ?`,
     [
         chapter.chapter_name
         ,chapter.chapter_details
-        ,chapter.chapter_type
+        ,chapter.photo_url
         ,id
     ],
     (err, res) => {
