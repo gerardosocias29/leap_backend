@@ -7,6 +7,11 @@ module.exports = app => {
   const topics = require("../controllers/topic.controller.js");
   const quiz = require("../controllers/quiz.controller.js");
 
+  const userTopic = require("../controllers/user_topic.controller.js");
+  const userTopicQuiz = require("../controllers/user_topic_quiz.controller.js");
+
+  const global = require("../controllers/global_functions.js");
+
   var router = require("express").Router();
 
   // router.post("/", tutorials.create);
@@ -39,6 +44,18 @@ module.exports = app => {
   router.get("/quizzes/:id", quiz.findOne);
   router.post("/quizzes/create", quiz.create);
   router.put("/quizzes/update/:id", quiz.update);
+
+  router.get("/user_topic/all", userTopic.findAll);
+  router.get("/user_topic/:id", userTopic.findOne);
+  router.post("/user_topic/create", userTopic.create);
+  router.put("/user_topic/update/:id", userTopic.update);
+
+  router.get("/user_topic_quiz/all", userTopicQuiz.findAll);
+  router.get("/user_topic_quiz/:id", userTopicQuiz.findOne);
+  router.post("/user_topic_quiz/create", userTopicQuiz.create);
+  router.put("/user_topic_quiz/update/:id", userTopicQuiz.update);
+
+  router.get("/user_topics_detailed/:user_id", global.getUserTopicsById);
 
   app.use('/api', router);
 };

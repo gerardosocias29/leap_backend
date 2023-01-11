@@ -1,4 +1,4 @@
-const Quiz = require("../models/quiz.model.js");
+const UserTopic = require("../models/user_topic.model.js");
 
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
@@ -14,31 +14,29 @@ exports.create = (req, res) => {
     }
     var params = req.body;
     // Create a Quiz
-    const quiz = new Quiz({
-        quiz_type : params.quiz_type,
-        quiz_question : params.quiz_question,
-        quiz_answer : params.quiz_answer,
-        quiz_choices : params.quiz_choices,
+    const userTopic = new UserTopic({
+        user_id : params.user_id,
         topic_id : params.topic_id,
+        status : params.status
     });
   
     // Save Quiz in the database
-    Quiz.create(quiz, (err, data) => {
+    UserTopic.create(userTopic, (err, data) => {
       if (err)
         return res.status(500).send({
         message:
-          err.message || "Some error occurred while creating the Quiz."
+          err.message || "Some error occurred while creating the UserTopic."
         });
       else return res.send(data);
     });
 };
 
 exports.findAll = (req, res) => {
-    Quiz.getAll((err, data) => {
+    UserTopic.getAll((err, data) => {
       if (err)
         return res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving Quiz."
+          err.message || "Some error occurred while retrieving UserTopic."
         });
       else return res.send(data);
     });
@@ -46,16 +44,16 @@ exports.findAll = (req, res) => {
 
 exports.findOne = (req, res) => {
   console.log(req);
-  Quiz.findById(req.params.id, (err, data) => {
+  UserTopic.findById(req.params.id, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
         res.status(404).send({
-          message: `Not found Quiz with id ${req.params.id}`,
+          message: `Not found UserTopic with id ${req.params.id}`,
           status: false
         });
       } else {
         res.status(500).send({
-          message: "Error retrieving Quiz with id " + req.params.id,
+          message: "Error retrieving UserTopic with id " + req.params.id,
           status: false
         });
       }
@@ -63,7 +61,7 @@ exports.findOne = (req, res) => {
   });
 };
 
-// Update a Quiz identified by the id in the request
+// Update a UserTopic identified by the id in the request
 exports.update = (req, res) => {
     // Validate Request
     if (!req.body) {
@@ -72,18 +70,18 @@ exports.update = (req, res) => {
       });
     }
   
-    Quiz.updateById(
+    UserTopic.updateById(
       req.params.id,
-      new Quiz(req.body),
+      new UserTopic(req.body),
       (err, data) => {
         if (err) {
             if (err.kind === "not_found") {
                 return res.status(404).send({
-                message: `Not found Quiz with id ${req.params.id}.`
+                message: `Not found UserTopic with id ${req.params.id}.`
                 });
             } else {
                 return res.status(500).send({
-                message: "Error updating Quiz with id " + req.params.id
+                message: "Error updating UserTopic with id " + req.params.id
                 });
             }
         } else return res.send(data);
