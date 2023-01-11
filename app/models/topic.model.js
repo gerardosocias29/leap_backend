@@ -2,7 +2,7 @@ const sql = require("./db.js");
 
 // constructor
 const Topic = function(topic) {
-    this.lesson_id = topic.chapter_name;
+    this.lesson_id = topic.lesson_id;
     this.topic_details = topic.topic_details;
     this.topic_title = topic.topic_title;
 };

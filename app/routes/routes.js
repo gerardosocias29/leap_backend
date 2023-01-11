@@ -5,6 +5,7 @@ module.exports = app => {
   const chapters = require("../controllers/chapter.controller.js");
   const lessons = require("../controllers/lesson.controller.js");
   const topics = require("../controllers/topic.controller.js");
+  const quiz = require("../controllers/quiz.controller.js");
 
   var router = require("express").Router();
 
@@ -33,6 +34,11 @@ module.exports = app => {
   router.get("/topics/:id", topics.findOne);
   router.post("/topics/create", topics.create);
   router.put("/topics/update/:id", topics.update);
+
+  router.get("/quizzes/all", quiz.findAll);
+  router.get("/quizzes/:id", quiz.findOne);
+  router.post("/quizzes/create", quiz.create);
+  router.put("/quizzes/update/:id", quiz.update);
 
   app.use('/api', router);
 };
