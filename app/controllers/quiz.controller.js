@@ -19,6 +19,7 @@ exports.create = (req, res) => {
         quiz_question : params.quiz_question,
         quiz_answer : params.quiz_answer,
         quiz_choices : params.quiz_choices,
+        timer : params.timer,
         topic_id : params.topic_id,
     });
   
