@@ -56,6 +56,7 @@ module.exports = app => {
   router.put("/user_topic_quiz/update/:id", userTopicQuiz.update);
 
   router.get("/user_topics_detailed/:user_id", global.getUserTopicsById);
+  router.get("/scored_users_list/all", global.getUserListWithScore);
 
   app.use('/api', router);
 };
