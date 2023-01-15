@@ -7,6 +7,7 @@ const UserTopicQuiz = function(userTopicQuiz) {
     this.quiz_id = userTopicQuiz.quiz_id;
     this.score = userTopicQuiz.score;
     this.status = userTopicQuiz.status;
+    this.quiz_type = userTopicQuiz.quiz_type;
 };
 
 UserTopicQuiz.create = (newUserTopicQuiz, result) => {
@@ -61,7 +62,7 @@ UserTopicQuiz.getAll = (result) => {
 UserTopicQuiz.updateById = (id, userTopicQuiz, result) => {
   sql.query(
     `UPDATE user_topics_quiz SET 
-    user_id = ?, user_topic_id = ?, quiz_id = ?, score = ?, status = ?
+    user_id = ?, user_topic_id = ?, quiz_id = ?, score = ?, status = ?, quiz_type = ?
     WHERE id = ?`,
     [
         userTopicQuiz.user_id
@@ -69,6 +70,7 @@ UserTopicQuiz.updateById = (id, userTopicQuiz, result) => {
         ,userTopicQuiz.quiz_id
         ,userTopicQuiz.score
         ,userTopicQuiz.status
+        ,userTopicQuiz.quiz_type
         ,id
     ],
     (err, res) => {

@@ -18,6 +18,7 @@ exports.create = (req, res) => {
         user_id: params.user_id,
         user_topic_id : params.user_topic_id,
         quiz_id : params.quiz_id,
+        quiz_type : params.quiz_type,
         score : params.score,
         status : params.status
     });

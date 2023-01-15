@@ -57,6 +57,8 @@ module.exports = app => {
 
   router.get("/user_topics_detailed/:user_id", global.getUserTopicsById);
   router.get("/scored_users_list/all", global.getUserListWithScore);
+  router.get("/user_topics_quiz/:user_id/:user_topic_id/:quiz_type", global.getUserTopicsQuiz);
+  router.get("/topic_quiz_list/:topic_id/:quiz_type", global.topicQuizList);
 
   app.use('/api', router);
 };
