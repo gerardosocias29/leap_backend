@@ -16,7 +16,39 @@ exports.getUserListWithScore = (request, result) => {
     SELECT u.id, u.first_name, u.last_name, SUM(IFNULL(utq.score,0)) as score
     FROM users u
     LEFT JOIN user_topics_quiz utq ON utq.user_id = u.id
+    WHERE u.role_id != 0
     GROUP BY u.id
+  `, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send(res);
+  });
+}
+
+exports.getUsersCount = (request, result) => {
+  sql.query(`
+    SELECT COUNT(*) as users_count
+    FROM users WHERE role_id != 0
+  `, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send(res[0]);
+  });
+}
+
+exports.getUsersWithTopicsDone = (request, result) => {
+  sql.query(`
+    SELECT MAX(ut.user_id) as id, COUNT(IFNULL(ut.user_id,0)) as topics_done
+    FROM user_topics ut
+    LEFT JOIN users u ON u.id = ut.user_id
+    WHERE u.role_id != 0
+    GROUP BY ut.user_id    
   `, (err, res) => {
     if (err) {
       return result.status(500).send({
@@ -51,6 +83,25 @@ exports.getUserTopicsQuiz = (request, result) => {
 exports.topicQuizList = (request, result) => {
   sql.query(`
     SELECT * FROM quizzes WHERE topic_id = '${request.params.topic_id}' AND quiz_type = '${request.params.quiz_type}'
+  `, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send(res);
+  });
+}
+
+exports.getLeaderboardsLists = (request, result) => {
+  sql.query(`
+    SELECT u.id, u.first_name, u.last_name, SUM(IFNULL(utq.score, 0)) as score
+    FROM users u
+    LEFT JOIN user_topics_quiz utq ON utq.user_id = u.id
+    WHERE u.role_id != 0
+    GROUP BY u.id
+    ORDER BY score DESC
+    ${(request.params.limit == "all") ? '' : 'LIMIT ' + request.params.limit}
   `, (err, res) => {
     if (err) {
       return result.status(500).send({
