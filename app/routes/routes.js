@@ -62,6 +62,7 @@ module.exports = app => {
   router.get("/users_count", global.getUsersCount);
   router.get("/users_with_topics_done", global.getUsersWithTopicsDone);
   router.get("/leaderboards_lists/:limit", global.getLeaderboardsLists);
+  router.get('/lessons_list/:chapter_id', global.getLessonsByChapterId);
 
   app.use('/api', router);
 };
