@@ -111,3 +111,16 @@ exports.getLeaderboardsLists = (request, result) => {
     return result.send(res);
   });
 }
+
+exports.getLessonsByChapterId = (request, result) => {
+  sql.query(`
+    SELECT * FROM lessons WHERE chapter_id = ${request.params.chapter_id}
+  `, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send(res);
+  });
+}
