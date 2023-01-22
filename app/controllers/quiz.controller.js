@@ -21,6 +21,7 @@ exports.create = (req, res) => {
         quiz_choices : params.quiz_choices,
         timer : params.timer,
         topic_id : params.topic_id,
+        answer_type: params.answer_type
     });
   
     // Save Quiz in the database

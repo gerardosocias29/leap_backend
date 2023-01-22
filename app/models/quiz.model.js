@@ -8,6 +8,7 @@ const Quiz = function(quiz) {
     this.quiz_choices = quiz.quiz_choices;
     this.timer = quiz.timer;
     this.topic_id = quiz.topic_id;
+    this.answer_type = quiz.answer_type;
 };
 
 Quiz.create = (newQuiz, result) => {
@@ -62,7 +63,7 @@ Quiz.getAll = (result) => {
 Quiz.updateById = (id, quiz, result) => {
   sql.query(
     `UPDATE quizzes SET 
-    quiz_type = ?, quiz_question = ?, quiz_answer = ?, quiz_choices = ?, timer = ?
+    quiz_type = ?, quiz_question = ?, quiz_answer = ?, quiz_choices = ?, timer = ?, answer_type = ?
     WHERE id = ?`,
     [
         quiz.quiz_type
