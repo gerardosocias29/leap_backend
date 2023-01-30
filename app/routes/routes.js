@@ -64,7 +64,8 @@ module.exports = app => {
   router.get("/leaderboards_lists/:limit", global.getLeaderboardsLists);
   router.get('/lessons_list/:chapter_id', global.getLessonsByChapterId);
 
-  router.get('/achievements/list', global.getAchivementsList);
+  router.get('/achievements/list/all', global.getAchivementsList);
+  router.get('/achievements/list/:user_id', global.getAchivementsListWithProgress);
   // router.get('/achievement/calculate_finished_lessons/:achievement_id/:chapter_id/:user_id', global.calculateAchievementsFinishedLessons);
   router.post('/achievement/calculate_finished_lessons', global.calculateAchievementsFinishedLessons);
   router.post('/achievement/calculate_all_quizzes', global.calculateAchievementsAllQuizzes);
