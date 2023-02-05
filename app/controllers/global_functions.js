@@ -246,10 +246,11 @@ exports.calculateAchievementsAllQuizzes = (req, result) => {
       c.chapter_name,
       COUNT(tb1.quiz_done) as quiz_done,
       (SELECT COUNT(q.id) 
-      FROM quizzes q 
-      LEFT JOIN topics t ON t.id = q.topic_id 
-      LEFT JOIN lessons les ON t.lesson_id = les.id
-      WHERE les.chapter_id = c.id
+        FROM quizzes q 
+        LEFT JOIN topics t ON t.id = q.topic_id 
+        LEFT JOIN lessons les ON t.lesson_id = les.id
+        WHERE les.chapter_id = c.id
+        GROUP BY c.id
       ) as quiz_count
     FROM chapters c
 
