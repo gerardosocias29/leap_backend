@@ -86,8 +86,8 @@ UserTopicQuiz.updateById = (id, userTopicQuiz, result) => {
         return;
       }
 
-      console.log("updated UserTopicQuiz: ", { id: id, ...quiz });
-      result(null, { id: id, ...quiz });
+      console.log("updated UserTopicQuiz: ", { id: id, ...userTopicQuiz });
+      result(null, { id: id, ...userTopicQuiz });
     }
   );
 };
