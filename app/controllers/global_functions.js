@@ -82,7 +82,14 @@ exports.getUserTopicsQuiz = (request, result) => {
 
 exports.topicQuizList = (request, result) => {
   sql.query(`
-    SELECT * FROM quizzes WHERE topic_id = '${request.params.topic_id}' AND quiz_type = '${request.params.quiz_type}'
+    SELECT * FROM quizzes 
+    WHERE topic_id = '${request.params.topic_id}' ${(request.params.quiz_type == "all") ? '' : "AND quiz_type = '" + request.params.quiz_type + "'" }
+    AND deleted_at IS NULL
+    ORDER BY CASE 
+      WHEN quiz_type = 'easy' then 1 
+      WHEN quiz_type = 'medium' then 2
+      WHEN quiz_type = 'hard' then 3
+      END ASC 
   `, (err, res) => {
     if (err) {
       return result.status(500).send({
@@ -250,6 +257,7 @@ exports.calculateAchievementsAllQuizzes = (req, result) => {
         LEFT JOIN topics t ON t.id = q.topic_id 
         LEFT JOIN lessons les ON t.lesson_id = les.id
         WHERE les.chapter_id = c.id
+        AND q.deleted_at IS NULL
         GROUP BY c.id
       ) as quiz_count
     FROM chapters c

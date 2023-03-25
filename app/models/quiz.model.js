@@ -46,7 +46,7 @@ Quiz.findById = (id, result) => {
 };
 
 Quiz.getAll = (result) => {
-  let query = "SELECT * FROM quizzes";
+  let query = "SELECT * FROM quizzes WHERE deleted_at IS NULL";
 
   sql.query(query, (err, res) => {
     if (err) {
@@ -93,7 +93,7 @@ Quiz.updateById = (id, quiz, result) => {
 };
 
 Quiz.remove = (id, result) => {
-  sql.query("DELETE FROM quizzes WHERE id = ?", id, (err, res) => {
+  sql.query("UPDATE quizzes SET deleted_at=NOW() WHERE id = ?", id, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);

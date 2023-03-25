@@ -92,3 +92,22 @@ exports.update = (req, res) => {
       }
     );
   };
+
+exports.remove = (req, res) => {
+  Quiz.remove(
+    req.params.id,
+    (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          return res.status(404).send({
+            message: `Not found Quiz with id ${req.params.id}.`
+          });
+        } else {
+          return res.status(500).send({
+            message: "Error deleting Quiz with id " + req.params.id
+          });
+        }
+      } else return res.send({ message: `Quiz was deleted successfully!`, status: true });
+    }
+  );
+}

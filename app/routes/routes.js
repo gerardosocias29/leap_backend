@@ -44,6 +44,7 @@ module.exports = app => {
   router.get("/quizzes/:id", quiz.findOne);
   router.post("/quizzes/create", quiz.create);
   router.put("/quizzes/update/:id", quiz.update);
+  router.delete("/quizzes/delete/:id", quiz.remove);
 
   router.get("/user_topic/all", userTopic.findAll);
   router.get("/user_topic/:id", userTopic.findOne);
