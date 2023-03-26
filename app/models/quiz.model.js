@@ -71,6 +71,7 @@ Quiz.updateById = (id, quiz, result) => {
         ,quiz.quiz_answer
         ,quiz.quiz_choices
         ,quiz.timer
+        ,quiz.answer_type
         ,id
     ],
     (err, res) => {
