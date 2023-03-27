@@ -42,7 +42,7 @@ Topic.findById = (id, result) => {
 };
 
 Topic.getAll = (result) => {
-  let query = "SELECT * FROM topics";
+  let query = "SELECT * FROM topics WHERE deleted_at IS NULL";
 
   sql.query(query, (err, res) => {
     if (err) {
@@ -80,14 +80,14 @@ Topic.updateById = (id, topic, result) => {
         return;
       }
 
-      console.log("updated topic: ", { id: id, ...tutorial });
-      result(null, { id: id, ...tutorial });
+      console.log("updated topic: ", { id: id, ...topic });
+      result(null, { id: id, ...topic });
     }
   );
 };
 
 Topic.remove = (id, result) => {
-  sql.query("DELETE FROM topics WHERE id = ?", id, (err, res) => {
+  sql.query("UPDATE topics SET deleted_at=NOW() WHERE id = ?", id, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);

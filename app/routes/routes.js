@@ -34,11 +34,13 @@ module.exports = app => {
   router.get("/lessons/:id", lessons.findOne);
   router.post("/lessons/create", lessons.create);
   router.put("/lessons/update/:id", lessons.update);
+  router.delete("/lessons/delete/:id", lessons.remove);
 
   router.get("/topics/all", topics.findAll);
   router.get("/topics/:id", topics.findOne);
   router.post("/topics/create", topics.create);
   router.put("/topics/update/:id", topics.update);
+  router.delete("/topics/delete/:id", topics.remove);
 
   router.get("/quizzes/all", quiz.findAll);
   router.get("/quizzes/:id", quiz.findOne);

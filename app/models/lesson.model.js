@@ -42,7 +42,7 @@ Lesson.findById = (id, result) => {
 };
 
 Lesson.getAll = (result) => {
-  let query = "SELECT * FROM lessons";
+  let query = "SELECT * FROM lessons WHERE deleted_at IS NULL";
 
   sql.query(query, (err, res) => {
     if (err) {
@@ -80,14 +80,14 @@ Lesson.updateById = (id, lesson, result) => {
         return;
       }
 
-      console.log("updated chapter: ", { id: id, ...tutorial });
-      result(null, { id: id, ...tutorial });
+      console.log("updated chapter: ", { id: id, ...lesson });
+      result(null, { id: id, ...lesson });
     }
   );
 };
 
 Lesson.remove = (id, result) => {
-  sql.query("DELETE FROM lessons WHERE id = ?", id, (err, res) => {
+  sql.query("UPDATE lessons SET deleted_at=NOW() WHERE id = ?", id, (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);

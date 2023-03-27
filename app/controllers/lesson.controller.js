@@ -88,3 +88,22 @@ exports.update = (req, res) => {
       }
     );
   };
+
+exports.remove = (req, res) => {
+  Lesson.remove(
+    req.params.id,
+    (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          return res.status(404).send({
+            message: `Not found Lesson with id ${req.params.id}.`
+          });
+        } else {
+          return res.status(500).send({
+            message: "Error deleting Lesson with id " + req.params.id
+          });
+        }
+      } else return res.send({ message: `Lesson was deleted successfully!`, status: true });
+    }
+  );
+}

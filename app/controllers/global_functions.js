@@ -121,7 +121,7 @@ exports.getLeaderboardsLists = (request, result) => {
 
 exports.getLessonsByChapterId = (request, result) => {
   sql.query(`
-    SELECT * FROM lessons WHERE chapter_id = ${request.params.chapter_id}
+    SELECT * FROM lessons WHERE chapter_id = ${request.params.chapter_id} AND deleted_at IS NULL
   `, (err, res) => {
     if (err) {
       return result.status(500).send({
