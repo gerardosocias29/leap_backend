@@ -184,11 +184,11 @@ exports.calculateAchievementsFinishedLessons = (req, result) => {
   let query = `SELECT
     c.id,
     l.lesson_name,
-      (SELECT COUNT(*) FROM topics t WHERE t.lesson_id = l.id) as topic_count,
+      (SELECT COUNT(*) FROM topics t WHERE t.lesson_id = l.id AND t.deleted_at IS NULL) as topic_count,
       IFNULL( 
       (tb1.topic_done
         / 
-      (SELECT COUNT(*) FROM topics t WHERE t.lesson_id = l.id)) * 100 
+      (SELECT COUNT(*) FROM topics t WHERE t.lesson_id = l.id AND t.deleted_at IS NULL)) * 100 
       ,0) as percentage,
         IFNULL( tb1.topic_done, 0 ) as topic_done
     FROM lessons l
@@ -197,10 +197,12 @@ exports.calculateAchievementsFinishedLessons = (req, result) => {
       FROM user_topics ut
       LEFT JOIN topics t ON t.id = ut.topic_id
       WHERE ut.user_id = ${user_id}
+      AND t.deleted_at IS NULL
         group by ut.id
     ) as tb1 ON tb1.lesson_id = l.id
 
     WHERE c.id IN (${achievement_chapter_ids})
+    AND l.deleted_at IS NULL
     ORDER BY tb1.topic_done DESC
     ${ achievement_score == 5 ? 'LIMIT 5' : ''}
   `;
@@ -257,6 +259,8 @@ exports.calculateAchievementsAllQuizzes = (req, result) => {
         LEFT JOIN topics t ON t.id = q.topic_id 
         LEFT JOIN lessons les ON t.lesson_id = les.id
         WHERE les.chapter_id = c.id
+        AND les.deleted_at IS NULL
+        AND t.deleted_at IS NULL
         AND q.deleted_at IS NULL
         GROUP BY c.id
       ) as quiz_count
@@ -270,10 +274,12 @@ exports.calculateAchievementsAllQuizzes = (req, result) => {
         LEFT JOIN user_topics ut ON ut.id = utq.user_topic_id
         LEFT JOIN topics ON topics.id = ut.topic_id
       WHERE utq.user_id = ${user_id}
+      AND topics.deleted_at IS NULL
         GROUP BY utq.id
     ) as tb1 ON tb1.lesson_id = l.id
 
     WHERE c.id IN (${achievement_chapter_ids})
+    AND l.deleted_at IS NULL
     GROUP BY c.chapter_name
   `;
 
@@ -302,5 +308,117 @@ exports.calculateAchievementsAllQuizzes = (req, result) => {
       return;
     });
     return result.send({status: 'success'});
+  });
+}
+
+exports.updateSchool = (req, result) => {
+  if (req.headers['content-type'] === 'application/json;') {
+    req.headers['content-type'] = 'application/json';
+  }
+
+  if (!req.body || req.body == "") {
+    return res.status(400).send({
+      message: "Content can not be empty!"
+    });
+  }
+
+  var params = req.body;
+
+  var school_name = params.school_name;
+  var id = req.params.id;
+
+  let query = `
+    UPDATE schools SET school_name = '${school_name}' WHERE id = '${id}'
+  `;
+
+  sql.query(query, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send({status: true, message: "Succesfully Update!"});
+  });
+}
+
+exports.getSchool = (request, result) => {
+  sql.query(`
+    SELECT school_name
+    FROM schools WHERE id = 1
+  `, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send(res[0]);
+  });
+}
+
+exports.getCourses = (request, result) => {
+  sql.query(`
+    SELECT *
+    FROM courses WHERE deleted_at IS NULL
+  `, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send(res);
+  });
+}
+
+exports.createCourses = (req, result) => {
+  if (req.headers['content-type'] === 'application/json;') {
+    req.headers['content-type'] = 'application/json';
+  }
+
+  if (!req.body || req.body == "") {
+    return res.status(400).send({
+      message: "Content can not be empty!"
+    });
+  }
+
+  var params = req.body;
+
+  var course_name = params.course_name;
+
+  let query = "INSERT INTO `courses` (`id`, `course_name`, `deleted_at`) VALUES (NULL, '"+course_name+"', NULL);";
+
+  sql.query(query, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send({status: true, message: "Succesfully Created!"});
+  });
+}
+
+exports.deleteCourses = (req, result) => {
+  if (req.headers['content-type'] === 'application/json;') {
+    req.headers['content-type'] = 'application/json';
+  }
+
+  if (!req.body || req.body == "") {
+    return res.status(400).send({
+      message: "Content can not be empty!"
+    });
+  }
+
+  var id = req.params.id;
+
+  let query = `
+    UPDATE courses SET deleted_at = NOW() WHERE id = '${id}'
+  `;
+
+  sql.query(query, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send({status: true, message: "Succesfully Deleted!"});
   });
 }

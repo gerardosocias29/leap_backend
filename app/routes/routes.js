@@ -74,5 +74,12 @@ module.exports = app => {
   router.post('/achievement/calculate_finished_lessons', global.calculateAchievementsFinishedLessons);
   router.post('/achievement/calculate_all_quizzes', global.calculateAchievementsAllQuizzes);
 
+  router.post('/school/update/:id', global.updateSchool);
+  router.get('/school/get', global.getSchool);
+
+  router.get('/courses/get', global.getCourses);
+  router.post('/courses/create', global.createCourses);
+  router.post('/courses/delete/:id', global.deleteCourses);
+
   app.use('/api', router);
 };

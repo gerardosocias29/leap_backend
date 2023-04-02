@@ -102,8 +102,8 @@ User.updateById = (id, user, result) => {
         return;
       }
 
-      console.log("updated users: ", { id: id, ...tutorial });
-      result(null, { id: id, ...tutorial });
+      console.log("updated users: ", { id: id, ...user });
+      result(null, { id: id, ...user });
     }
   );
 };
