@@ -95,7 +95,7 @@ exports.update = (req, res) => {
                 message: "Error updating User with id " + req.params.id
                 });
             }
-        } else return res.send({ message: `Profile was updated successfully!`, status: true });
+        } else return res.send({ message: `Profile was updated successfully!`, status: true, data: data });
       }
     );
   };
