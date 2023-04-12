@@ -153,10 +153,11 @@ exports.getAchivementsListWithProgress = (request, result) => {
 
 exports.getAchivementsListWithFullProgress = (request, result) => {
   sql.query(`
-    SELECT a.*, IFNULL(ua.progress, 0) as progress, ua.status
+    SELECT a.*, IFNULL(ua.progress, 0) as progress, ua.status, ua.id as user_achievement_id
     FROM achievements a
     LEFT JOIN user_achievements ua ON ua.achievement_id = a.id AND ua.user_id = ${request.params.user_id}
-    WHERE ua.progress != null
+    WHERE ua.progress >= 100
+    AND status = 'notify_ready'
     `, async (err, achievements) => {  if (err) { return result.status(500).send({ message: err.message || "Some error occurred while retrieving data." }); }
       return result.send(achievements);
     }
@@ -203,6 +204,7 @@ exports.calculateAchievementsFinishedLessons = (req, result) => {
 
     WHERE c.id IN (${achievement_chapter_ids})
     AND l.deleted_at IS NULL
+    AND tb1.topic_done > 0
     ORDER BY tb1.topic_done DESC
     ${ achievement_score == 5 ? 'LIMIT 5' : ''}
   `;
@@ -212,16 +214,25 @@ exports.calculateAchievementsFinishedLessons = (req, result) => {
         message: err.message || "Some error occurred while retrieving data."
       });
     }
+
     var percentage = 0.0;
     res.forEach((value, index) => {
-      percentage += parseFloat(value.percentage);
+      percentage += parseFloat(value['percentage']);
     });
     percentage = parseFloat(percentage / res.length).toFixed(2);
-    var notif = (percentage == 100) ? 'notify_ready' : 'notify_not_ready';
-    var status = (notif == 'notify_ready') ? ', status = "' + notif +'"' : ', status = "' + notif +'"';
+    var notif = (percentage >= 100) ? 'notify_ready' : 'notify_not_ready';
+
+    if(achievement_score == 5){
+      percentage = parseFloat((res.length / 5) * 100).toFixed(2);
+      notif = (percentage >= 100) ? 'notify_ready' : 'notify_not_ready';
+    }
+    if(res.length == 0){
+      percentage = 0.0;
+    }
+
     sql.query(`
       INSERT INTO user_achievements (user_id, achievement_id, status, progress) VALUES (${user_id},${achievement_id},'${notif}',${percentage})
-      ON DUPLICATE KEY UPDATE progress = ${percentage} ${status}
+      ON DUPLICATE KEY UPDATE progress = ${percentage}, status = IF(status <> 'notify_done', '${notif}', status) 
     `, (err, ua) => {
       if (err) {
         console.log("error: ", err);
@@ -229,9 +240,22 @@ exports.calculateAchievementsFinishedLessons = (req, result) => {
       }
       return;
     });
-    return result.send({status: 'success'});
+    
   });
   
+}
+
+exports.updateUserAchievement = (req, result) => {
+  // req.params.id
+  let query = `UPDATE user_achievements SET status = 'notify_done' WHERE id = ${req.params.id}`;
+  sql.query(query, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while updating data."
+      });
+    }
+    return result.send({status: 'success'});
+  });
 }
 
 exports.calculateAchievementsAllQuizzes = (req, result) => {

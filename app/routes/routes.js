@@ -73,6 +73,7 @@ module.exports = app => {
   // router.get('/achievement/calculate_finished_lessons/:achievement_id/:chapter_id/:user_id', global.calculateAchievementsFinishedLessons);
   router.post('/achievement/calculate_finished_lessons', global.calculateAchievementsFinishedLessons);
   router.post('/achievement/calculate_all_quizzes', global.calculateAchievementsAllQuizzes);
+  router.put('/user_achievement/update/:id', global.updateUserAchievement);
 
   router.post('/school/update/:id', global.updateSchool);
   router.get('/school/get', global.getSchool);
