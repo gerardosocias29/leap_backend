@@ -164,6 +164,22 @@ exports.getAchivementsListWithFullProgress = (request, result) => {
   )
 }
 
+exports.getAchievementUserLists = (request, result) => {
+  sql.query(`
+      SELECT a.id, ua.user_id,
+        CONCAT(u.first_name, ' ', u.last_name) as name,
+          u.year, u.course,
+          u.email, u.username
+      FROM achievements a
+      LEFT JOIN user_achievements ua ON ua.achievement_id = a.id
+      LEFT JOIN users u ON u.id = ua.user_id
+      WHERE a.id = ${request.params.achievement_id};
+    `, async (err, achievements) => {  if (err) { return result.status(500).send({ message: err.message || "Some error occurred while retrieving data." }); }
+      return result.send(achievements);
+    }
+  )
+}
+
 exports.calculateAchievementsFinishedLessons = (req, result) => {
   // Validate request
   if (req.headers['content-type'] === 'application/json;') {
