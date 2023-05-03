@@ -83,5 +83,7 @@ module.exports = app => {
   router.post('/courses/create', global.createCourses);
   router.post('/courses/delete/:id', global.deleteCourses);
 
+  router.post('/check-student', global.createCourses);
+
   app.use('/api', router);
 };

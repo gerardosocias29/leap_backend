@@ -462,3 +462,37 @@ exports.deleteCourses = (req, result) => {
     return result.send({status: true, message: "Succesfully Deleted!"});
   });
 }
+
+exports.checkUserDetails = (req, result) => {
+  if (req.headers['content-type'] === 'application/json;') {
+    req.headers['content-type'] = 'application/json';
+  }
+
+  if (!req.body || req.body == "") {
+    return res.status(400).send({
+      message: "Content can not be empty!"
+    });
+  }
+
+  var params = req.body;
+  var student_id = params.student_id;
+  var first_name = params.first_name;
+  var last_name = params.last_name;
+  var course = params.course;
+  var year = params.year;
+
+  let query = `
+    SELECT * FROM school_users WHERE
+    student_id = '${student_id}' AND first_name = '${first_name}'
+    AND last_name = '${last_name}' AND course = '${course}' AND year_level = ${year}
+  `;
+
+  sql.query(query, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send({status: true, message: "Succesful!"});
+  });
+}
