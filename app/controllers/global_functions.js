@@ -496,3 +496,17 @@ exports.checkUserDetails = (req, result) => {
     return result.send({status: true, message: "Succesful!"});
   });
 }
+
+exports.checkStudentId = (request, result) => {
+  sql.query(`
+    SELECT *
+    FROM school_users WHERE student_id LIKE '%${request.params.id_number}%'
+  `, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send(res);
+  });
+}

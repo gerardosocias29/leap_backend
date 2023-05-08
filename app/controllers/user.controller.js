@@ -29,6 +29,7 @@ exports.create = (req, res) => {
         course : params.course,
         year : params.year,
         photoURL : params.photoURL,
+        school_user_id: params.school_user_id
     });
   
     // Save User in the database

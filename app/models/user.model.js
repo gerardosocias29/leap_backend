@@ -17,6 +17,7 @@ const User = function(user) {
     this.year = user.year;
     this.photoURL = user.photoURL;
     this.deleted_at = user.deleted_at;
+    this.school_user_id = user.school_user_id;
 };
 
 User.create = (newUser, result) => {
@@ -71,7 +72,7 @@ User.getAll = (result) => {
 User.updateById = (id, user, result) => {
   sql.query(
     `UPDATE users SET 
-        first_name = ?, last_name = ?, username = ?, email = ?, phone = ?, gender = ?, address = ?, birthday = ?, school_id = ?, role_id = ?, course = ?, year = ?, photoURL = ?
+        first_name = ?, last_name = ?, username = ?, email = ?, phone = ?, gender = ?, address = ?, birthday = ?, school_id = ?, role_id = ?, course = ?, year = ?, photoURL = ?, school_user_id = ?
     WHERE id = ?`,
     [
         user.first_name
@@ -87,6 +88,7 @@ User.updateById = (id, user, result) => {
         ,user.course
         ,user.year
         ,user.photoURL
+        ,user.school_user_id
         , id
     ],
     (err, res) => {
