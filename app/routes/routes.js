@@ -86,5 +86,7 @@ module.exports = app => {
   router.get('/check-student-id/:id_number', global.checkStudentId);
   router.post('/check-student', global.checkUserDetails);
 
+  router.get('/achievement-with-user-lists', global.getAchievementsWithUserLists);
+
   app.use('/api', router);
 };

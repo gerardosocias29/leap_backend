@@ -510,3 +510,17 @@ exports.checkStudentId = (request, result) => {
     return result.send(res);
   });
 }
+
+exports.getAchievementsWithUserLists = (request, result) => {
+  sql.query(`
+    SELECT *
+    FROM user_achievements WHERE achievement_id = ${request.params.achievement_id} AND status = 'notify_done' OR status = 'notify_ready'
+  `, (err, res) => {
+    if (err) {
+      return result.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return result.send(res);
+  });
+}
