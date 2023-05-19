@@ -513,8 +513,12 @@ exports.checkStudentId = (request, result) => {
 
 exports.getAchievementsWithUserLists = (request, result) => {
   sql.query(`
-    SELECT *
-    FROM user_achievements WHERE achievement_id = ${request.params.achievement_id} AND status = 'notify_done' OR status = 'notify_ready'
+    SELECT u.*
+    FROM users u
+    JOIN user_achievements ua ON ua.user_id = u.id
+    WHERE u.deleted_at IS NULL
+    AND ua.status IN ('notify_done', 'notify_ready')
+    AND ua.achievement_id = ${request.params.achievement_id};
   `, (err, res) => {
     if (err) {
       return result.status(500).send({
