@@ -528,3 +528,108 @@ exports.getAchievementsWithUserLists = (request, result) => {
     return result.send(res);
   });
 }
+
+exports.getUserDashboardData = (request, response) => {
+  return new Promise((resolve, reject) => {
+    const dashboard_results = {
+      grammarAndSpeech: [],
+      quizScore: [],
+      achievementData: []
+    };
+
+    sql.query(`
+      SELECT c.chapter_name, 
+        COUNT(DISTINCT ut.topic_id) * 100 / COUNT(t.id) as chapter_perc
+      FROM chapters c
+      LEFT JOIN lessons l ON l.chapter_id = c.id
+      LEFT JOIN topics t ON t.lesson_id = l.id
+      LEFT JOIN user_topics ut ON ut.topic_id = t.id AND ut.status = 'done' AND ut.user_id = ${request.params.user_id}
+      WHERE l.deleted_at IS NULL
+      GROUP BY c.chapter_name;
+    `, (err, res) => {
+      if (err) {
+        reject(err);
+      } else {
+        dashboard_results.grammarAndSpeech = res;
+        sql.query(`
+          SELECT 
+            q_count.overall_quiz_count AS overall_scores,
+            COALESCE(utq.sum_of_scores, 0) AS quizzes_scores,
+            COALESCE(utq.score_rank, 0) AS score_rank
+          FROM (
+            SELECT COUNT(*) AS overall_quiz_count
+            FROM quizzes
+            WHERE deleted_at IS NULL
+          ) AS q_count
+          LEFT JOIN (
+            SELECT
+              utq.quiz_id,
+              utq.sum_of_scores,
+              (
+                SELECT COUNT(DISTINCT utq2.quiz_id) + 1
+                FROM (
+                  SELECT
+                    quiz_id,
+                    SUM(score) AS sum_of_scores
+                  FROM
+                    user_topics_quiz
+                  WHERE
+                    status = 'taken' AND deleted_at IS NULL
+                    AND user_id != ${request.params.user_id}
+                    
+                  GROUP BY
+                    quiz_id
+                ) AS utq2
+                WHERE
+                  utq2.sum_of_scores > utq.sum_of_scores
+                  OR (utq2.sum_of_scores = utq.sum_of_scores AND utq2.quiz_id < utq.quiz_id)
+              ) AS score_rank
+            FROM (
+              SELECT
+                quiz_id,
+                SUM(score) AS sum_of_scores
+              FROM
+                user_topics_quiz
+              WHERE
+                status = 'taken' AND deleted_at IS NULL
+                AND user_id = ${request.params.user_id}
+              GROUP BY
+                quiz_id
+            ) AS utq
+          ) AS utq ON utq.quiz_id IS NOT NULL;
+        `, (err, res) => {
+          if (err) {
+            reject(err);
+          } else {
+            dashboard_results.quizScore = res[0];
+
+            sql.query(`
+              SELECT COUNT(*) achievement_count,
+              (
+                SELECT COUNT(*) FROM user_achievements
+                WHERE status IN ('notify_ready', 'notify_done') AND user_id = ${request.params.user_id}
+              ) as user_achievement_count
+              FROM achievements a;
+            `, (err, res) => {
+              if (err) {
+                reject(err);
+              } else {
+                dashboard_results.achievementData = res[0];
+                resolve(dashboard_results);
+              }
+            })
+          }
+        });
+
+      }
+    });
+   
+  })
+  .then((dashboard_results) => {
+    response.send([dashboard_results]);
+  })
+  .catch((err) => {
+    console.error(err);
+    response.status(500).send('Internal Server Error');
+  });
+}

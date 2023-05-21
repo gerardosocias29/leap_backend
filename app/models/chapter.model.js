@@ -42,7 +42,9 @@ Chapter.findById = (id, result) => {
 };
 
 Chapter.getAll = (result) => {
-  let query = "SELECT * FROM chapters";
+  let query = `SELECT c.*, (SELECT COUNT(id) FROM lessons WHERE chapter_id = c.id) as lesson_count
+    FROM chapters c
+  `;
 
   sql.query(query, (err, res) => {
     if (err) {
