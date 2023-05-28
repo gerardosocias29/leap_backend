@@ -89,6 +89,7 @@ module.exports = app => {
   router.get('/achievement-with-user-lists/:achievement_id', global.getAchievementsWithUserLists);
 
   router.get('/get_user_dashboard_data/:user_id', global.getUserDashboardData);
+  router.get('/get_admin_dashboard_data', global.getAdminDashboardData);
 
   app.use('/api', router);
 };

@@ -633,3 +633,61 @@ exports.getUserDashboardData = (request, response) => {
     response.status(500).send('Internal Server Error');
   });
 }
+
+exports.getAdminDashboardData = (request, response) => {
+  return new Promise((resolve, reject) => {
+    const dashboard_results = {
+      chapterUsage: [],
+      registeredUsers: []
+    };
+
+    sql.query(`
+      SELECT
+        chapters.chapter_name,
+        COUNT(DISTINCT topics.id) AS total_topics,
+        COUNT(user_topics.id) AS topics_done,
+        COUNT(user_topics.id) / COUNT(DISTINCT topics.id) * 100 AS usage_percentage
+      FROM
+        chapters
+      JOIN
+        lessons ON chapters.id = lessons.chapter_id
+      JOIN
+        topics ON lessons.id = topics.lesson_id
+      LEFT JOIN
+        user_topics ON topics.id = user_topics.topic_id AND user_topics.status = 'done'
+      WHERE
+        chapters.chapter_name IN ('Grammar', 'Speech')
+      GROUP BY
+        chapters.chapter_name;
+    `, (err, res) => {
+      if (err) {
+        reject(err);
+      } else {
+        dashboard_results.chapterUsage = res;
+        sql.query(`
+          SELECT 
+            COUNT(*) AS total_registered_users,
+            (COUNT(*) / (SELECT COUNT(*) FROM school_users)) * 100 AS percentage_registered_users
+          FROM school_users
+          JOIN users ON school_users.student_id = users.school_user_id
+          WHERE users.role_id != 0
+            AND school_users.first_name = users.first_name
+            AND school_users.last_name = users.last_name
+            AND school_users.course = users.course;
+        `, (err, res) => {
+          if (err) {
+            reject(err);
+          } else {
+            dashboard_results.registeredUsers = res;
+            resolve(dashboard_results);
+          }
+        });
+      }
+    })
+  }).then((dashboard_results) => {
+    response.send([dashboard_results]);
+  }).catch((err) => {
+    console.error(err);
+    response.status(500).send('Internal Server Error');
+  });
+}
