@@ -552,51 +552,59 @@ exports.getUserDashboardData = (request, response) => {
       } else {
         dashboard_results.grammarAndSpeech = res;
         sql.query(`
-          SELECT 
-            q_count.overall_quiz_count AS overall_scores,
-            COALESCE(utq.sum_of_scores, 0) AS quizzes_scores,
-            COALESCE(utq.score_rank, 0) AS score_rank
-          FROM (
-            SELECT COUNT(*) AS overall_quiz_count
-            FROM quizzes
-            WHERE deleted_at IS NULL
-          ) AS q_count
-          LEFT JOIN (
-            SELECT
-              utq.quiz_id,
-              utq.sum_of_scores,
-              (
-                SELECT COUNT(DISTINCT utq2.quiz_id) + 1
-                FROM (
-                  SELECT
-                    quiz_id,
-                    SUM(score) AS sum_of_scores
-                  FROM
-                    user_topics_quiz
-                  WHERE
-                    status = 'taken' AND deleted_at IS NULL
-                    AND user_id != ${request.params.user_id}
-                    
-                  GROUP BY
-                    quiz_id
-                ) AS utq2
+        SELECT
+          q_count.overall_quiz_count AS overall_scores,
+          SUM(COALESCE(utq.sum_of_scores, 0)) AS quizzes_scores,
+          COALESCE(utq.score_rank, 0) AS score_rank
+        FROM (
+          SELECT COUNT(*) AS overall_quiz_count
+          FROM quizzes
+          WHERE deleted_at IS NULL
+        ) AS q_count
+        LEFT JOIN (
+          SELECT
+            utq.quiz_id,
+            utq.quiz_type,
+            utq.sum_of_scores,
+            (
+              SELECT COUNT(DISTINCT utq2.quiz_id) + 1
+              FROM (
+                SELECT
+                  quiz_id,
+                  quiz_type,
+                  SUM(score) AS sum_of_scores
+                FROM
+                  user_topics_quiz
                 WHERE
-                  utq2.sum_of_scores > utq.sum_of_scores
-                  OR (utq2.sum_of_scores = utq.sum_of_scores AND utq2.quiz_id < utq.quiz_id)
-              ) AS score_rank
-            FROM (
-              SELECT
-                quiz_id,
-                SUM(score) AS sum_of_scores
-              FROM
-                user_topics_quiz
+                  status = 'taken' AND deleted_at IS NULL
+                  AND user_id != ${request.params.user_id}
+                GROUP BY
+                  quiz_id,
+                  quiz_type
+              ) AS utq2
               WHERE
-                status = 'taken' AND deleted_at IS NULL
-                AND user_id = ${request.params.user_id}
-              GROUP BY
-                quiz_id
-            ) AS utq
-          ) AS utq ON utq.quiz_id IS NOT NULL;
+                (utq2.sum_of_scores > utq.sum_of_scores
+                OR (utq2.sum_of_scores = utq.sum_of_scores AND utq2.quiz_id < utq.quiz_id))
+                AND utq2.quiz_type = utq.quiz_type
+            ) AS score_rank
+          FROM (
+            SELECT
+              quiz_id,
+              quiz_type,
+              SUM(score) AS sum_of_scores
+            FROM
+              user_topics_quiz
+            WHERE
+              status = 'taken' AND deleted_at IS NULL
+              AND user_id = ${request.params.user_id}
+            GROUP BY
+              quiz_id,
+              quiz_type
+          ) AS utq
+        ) AS utq ON utq.quiz_id IS NOT NULL
+        GROUP BY
+          q_count.overall_quiz_count,
+          utq.score_rank;
         `, (err, res) => {
           if (err) {
             reject(err);
@@ -637,16 +645,19 @@ exports.getUserDashboardData = (request, response) => {
 exports.getAdminDashboardData = (request, response) => {
   return new Promise((resolve, reject) => {
     const dashboard_results = {
-      chapterUsage: [],
-      registeredUsers: []
+      chapterUsage: {
+        grammar: {},
+        speech: {}
+      },
+      registeredUsers: {}
     };
 
     sql.query(`
       SELECT
         chapters.chapter_name,
         COUNT(DISTINCT topics.id) AS total_topics,
-        COUNT(user_topics.id) AS topics_done,
-        COUNT(user_topics.id) / COUNT(DISTINCT topics.id) * 100 AS usage_percentage
+        COUNT(DISTINCT user_topics.topic_id) AS topics_done,
+        COUNT(DISTINCT user_topics.topic_id) / COUNT(DISTINCT topics.id) * 100 AS usage_percentage
       FROM
         chapters
       JOIN
@@ -663,7 +674,8 @@ exports.getAdminDashboardData = (request, response) => {
       if (err) {
         reject(err);
       } else {
-        dashboard_results.chapterUsage = res;
+        dashboard_results.chapterUsage.grammar = res[0];
+        dashboard_results.chapterUsage.speech = res[1];
         sql.query(`
           SELECT 
             COUNT(*) AS total_registered_users,
@@ -678,7 +690,7 @@ exports.getAdminDashboardData = (request, response) => {
           if (err) {
             reject(err);
           } else {
-            dashboard_results.registeredUsers = res;
+            dashboard_results.registeredUsers = res[0];
             resolve(dashboard_results);
           }
         });
