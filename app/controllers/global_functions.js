@@ -500,7 +500,7 @@ exports.checkUserDetails = (req, result) => {
 exports.checkStudentId = (request, result) => {
   sql.query(`
     SELECT *
-    FROM school_users WHERE student_id LIKE '%${request.params.id_number}%'
+    FROM school_users WHERE student_id LIKE '${request.params.id_number}'
   `, (err, res) => {
     if (err) {
       return result.status(500).send({
