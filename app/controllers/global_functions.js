@@ -703,3 +703,16 @@ exports.getAdminDashboardData = (request, response) => {
     response.status(500).send('Internal Server Error');
   });
 }
+
+exports.getReferences = (request, response) => {
+  sql.query(`
+    SELECT * FROM credits WHERE deleted_at IS NULL;
+  `, (err, res) => {
+    if (err) {
+      return response.status(500).send({
+        message: err.message || "Some error occurred while retrieving data."
+      });
+    }
+    return response.send(res);
+  });
+}
